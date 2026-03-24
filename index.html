@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:," />
+    <title>Reto de Letras - Juego de Palabras en Español</title>
+    <meta name="description"
+        content="Juego de palabras en español: encuentra una palabra del diccionario que contenga 3 letras en orden." />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+</head>
+
+<body class="min-h-screen text-slate-900">
+
+    <header class="mx-auto max-w-5xl px-4 pb-4 pt-6 sm:px-6 lg:px-8">
+        <h1 class="mt-2 text-3xl font-black sm:text-4xl">Reto de Letras</h1>
+        <p class="mt-2 text-sm text-slate-700 sm:text-base">
+            Escribe una palabra válida en español que contenga las 3 letras en el mismo orden. Si aparece
+            <strong>?</strong>, esa posición acepta cualquier letra.
+        </p>
+    </header>
+
+    <main id="contenido-principal" tabindex="-1"
+        class="mx-auto grid max-w-5xl gap-4 px-4 pb-8 sm:px-6 lg:grid-cols-[2fr,1fr] lg:px-8">
+        <section class="card p-4 sm:p-6">
+            <h2 id="titulo-juego" class="text-lg font-bold sm:text-xl">Partida</h2>
+
+            <div class="mt-4 rounded-2xl border border-sky-200 p-4">
+                <p class="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">Combinación actual</p>
+                <div id="combo-actual" class="mt-3 flex flex-wrap gap-2"></div>
+            </div>
+
+            <form id="form-intento" class="mt-4 grid gap-3" novalidate>
+                <div>
+                    <label for="input-palabra" class="mb-1.5 block text-sm font-semibold">Tu palabra</label>
+                    <input id="input-palabra" name="palabra" type="text" autocomplete="off"
+                        class="w-full rounded-xl border border-slate-300 px-3 py-2 text-base shadow-sm outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-300"
+                        placeholder="..." required />
+                    <p id="ayuda-palabra" class="mt-1 text-xs text-slate-600">Solo letras (se aceptan acentos, ñ y ü).
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    <button id="btn-enviar" type="submit" class="btn-primary w-full">Validar palabra</button>
+                    <button id="btn-saltar-sin-bloquear" type="button" class="btn-secondary w-full">Saltar</button>
+                    <button id="btn-saltar" type="button" class="btn-secondary w-full">Bloquear combinación</button>
+                    <button id="btn-menu" type="button" class="btn-secondary w-full">
+                        Gestionar bloqueadas
+                    </button>
+                </div>
+
+                <div class="flex flex-row items-start gap-4">
+                    <p id="estado-intento" class="min-h-6 text-sm font-medium"></p>
+                    <p id="temporizador" class="min-h-6 text-sm text-slate-700"></p>
+                </div>
+            </form>
+
+            <div class="mt-4 rounded-2xl border border-cyan-200 bg-cyan-50 p-3.5 sm:p-4">
+                <label for="switch-frecuencia" class="flex cursor-pointer items-start justify-between gap-3">
+                    <span>
+                        <span class="block text-sm font-semibold">Modo por frecuencia del español</span>
+                        <span class="block text-xs text-slate-700">Si activas este modo, las letras comunes aparecen más
+                            seguido.</span>
+                    </span>
+                    <span class="relative mt-0.5 inline-flex items-center">
+                        <input id="switch-frecuencia" type="checkbox" class="peer sr-only" />
+                        <span class="h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-cyan-600"></span>
+                        <span
+                            class="absolute left-1 h-4 w-4 rounded-full bg-white transition peer-checked:left-6"></span>
+                    </span>
+                </label>
+            </div>
+        </section>
+
+        <aside class="space-y-4">
+            <section class="card p-4">
+                <h2 id="titulo-puntuacion" class="text-sm font-semibold uppercase tracking-[0.15em] text-sky-700">
+                    Puntuación</h2>
+                <p class="mt-1 text-4xl font-black" id="puntos">0</p>
+                <p class="text-xs text-slate-700">+1 por cada combinación resuelta correctamente.</p>
+            </section>
+
+            <section class="card p-4">
+                <h2 id="titulo-historial" class="text-sm font-semibold uppercase tracking-[0.15em] text-sky-700">
+                    Historial</h2>
+                <p class="mt-1 text-xs text-slate-700">Últimas 200 acciones.</p>
+                <ul id="historial" class="mt-3 max-h-[20rem] space-y-2 overflow-auto pr-1"></ul>
+            </section>
+        </aside>
+    </main>
+
+    <dialog id="dialog-bloqueadas"
+        class="w-[min(42rem,96vw)] rounded-2xl border border-slate-200 p-0 shadow-2xl backdrop:bg-slate-900/40">
+        <form method="dialog" class="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+            <h2 class="text-base font-bold">Combinaciones bloqueadas</h2>
+            <button class="btn-ghost" value="cancel">Cerrar</button>
+        </form>
+
+        <div class="space-y-4 p-4">
+            <p class="text-sm text-slate-700">Estas combinaciones no volverán a aparecer. Puedes agregarlas, quitarlas o
+                vaciar toda la lista.</p>
+
+            <form id="form-bloqueada" class="flex flex-wrap gap-2" novalidate>
+                <label for="input-bloqueada" class="sr-only">Nueva combinación bloqueada</label>
+                <input id="input-bloqueada" name="combinacion" type="text"
+                    class="min-w-44 flex-1 rounded-xl border border-slate-300 px-3 py-2 outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-300"
+                    placeholder="Ej: a?r o sol" required />
+                <button type="submit" class="btn-primary">Agregar</button>
+                <button id="btn-vaciar-bloqueadas" type="button" class="btn-danger">Vaciar lista</button>
+            </form>
+            <p id="ayuda-bloqueada" class="text-xs text-slate-600">Formato: 3 caracteres (a-z, ñ o ?) con máximo un
+                comodín.</p>
+            <p id="estado-bloqueada" class="min-h-5 text-sm"></p>
+
+            <ul id="lista-bloqueadas" class="grid max-h-56 gap-2 overflow-auto pr-1 sm:grid-cols-2"></ul>
+
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
+                La validación de palabras usa Wiktionary en tiempo real.
+            </div>
+        </div>
+    </dialog>
+</body>
+
+</html>
