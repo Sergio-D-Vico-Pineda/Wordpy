@@ -123,15 +123,30 @@ a:focus-visible {
 }
 
 .combo-chip {
-    min-width: 3rem;
+    min-width: 4rem;
+    min-height: 4rem;
     border: 1px solid #7dd3fc;
-    border-radius: 0.9rem;
-    padding: 0.45rem 0.8rem;
-    font-size: 1.35rem;
+    border-radius: 1.15rem;
+    padding: 0.5rem 0.95rem;
+    font-size: 1.7rem;
     font-weight: 800;
     text-align: center;
     text-transform: uppercase;
-    background: #ecfeff;
+    background: linear-gradient(180deg, #ffffff 0%, #ecfeff 100%);
+    box-shadow: 0 14px 22px -18px #0f172a;
+}
+
+#combo-actual {
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    scrollbar-width: none;
+}
+
+#combo-actual::-webkit-scrollbar {
+    display: none;
 }
 
 .combo-chip.wildcard {
@@ -244,8 +259,11 @@ dialog::backdrop {
     }
 
     .combo-chip {
-        min-width: 2.65rem;
-        font-size: 1.2rem;
+        min-width: 3.25rem;
+        min-height: 3.25rem;
+        font-size: 1.35rem;
+        padding: 0.42rem 0.7rem;
+        border-radius: 1rem;
     }
 
     .history-time {

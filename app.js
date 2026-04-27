@@ -3,8 +3,8 @@ const STORAGE_KEY = "reto-letras-v1";
 const HISTORY_LIMIT = 200;
 const WILDCARD_SYMBOL = "?";
 const WILDCARD_PROBABILITY = 0.05;
-const COOLDOWN_MIN_SECONDS = 5;
-const COOLDOWN_MAX_SECONDS = 10;
+const COOLDOWN_MIN_SECONDS = 1;
+const COOLDOWN_MAX_SECONDS = 4;
 const LETTERS = "abcdefghijklmn\u00f1opqrstuvwxyz";
 const LETTER_WEIGHTS = {
     a: 12.53,
@@ -39,6 +39,7 @@ const LETTER_WEIGHTS = {
 const state = {
     points: 0,
     currentCombo: [],
+    lastValidWord: "",
     bannedCombos: new Set(),
     history: [],
     useWeightedRandom: false,
@@ -49,6 +50,10 @@ const state = {
 const els = {
     comboActual: document.querySelector("#combo-actual"),
     puntos: document.querySelector("#puntos"),
+    wiktionaryLink: document.querySelector("#wiktionary-link"),
+    wiktionaryPlaceholder: document.querySelector("#wiktionary-placeholder"),
+    wiktionaryPreview: document.querySelector("#wiktionary-preview"),
+    wiktionaryWord: document.querySelector("#wiktionary-word"),
     historial: document.querySelector("#historial"),
     formIntento: document.querySelector("#form-intento"),
     inputPalabra: document.querySelector("#input-palabra"),
@@ -182,6 +187,7 @@ function persistState() {
     const payload = {
         points: state.points,
         currentCombo: state.currentCombo,
+        lastValidWord: state.lastValidWord,
         bannedCombos: Array.from(state.bannedCombos),
         history: state.history,
         useWeightedRandom: state.useWeightedRandom,
@@ -200,6 +206,7 @@ function loadPersistedState() {
         const data = JSON.parse(raw);
         state.points = Number.isFinite(data.points) ? data.points : 0;
         state.currentCombo = Array.isArray(data.currentCombo) ? data.currentCombo.slice(0, 3) : [];
+        state.lastValidWord = typeof data.lastValidWord === "string" ? data.lastValidWord : "";
         state.bannedCombos = new Set(Array.isArray(data.bannedCombos) ? data.bannedCombos : []);
         state.history = Array.isArray(data.history) ? data.history.slice(0, HISTORY_LIMIT) : [];
         state.useWeightedRandom = Boolean(data.useWeightedRandom);
@@ -221,6 +228,48 @@ function renderCombo() {
 
 function renderScore() {
     els.puntos.textContent = String(state.points);
+}
+
+function normalizeWiktionaryLookupWord(value) {
+    return value.trim().normalize("NFC").toLocaleLowerCase("es-ES");
+}
+
+function buildWiktionaryWordUrl(rawWord) {
+    return `https://es.wiktionary.org/wiki/${encodeURIComponent(normalizeWiktionaryLookupWord(rawWord))}`;
+}
+
+function renderWiktionaryPreview() {
+    const hasValidWord = state.lastValidWord !== "";
+
+    if (els.wiktionaryPlaceholder) {
+        els.wiktionaryPlaceholder.hidden = hasValidWord;
+    }
+
+    if (els.wiktionaryPreview) {
+        els.wiktionaryPreview.hidden = !hasValidWord;
+    }
+
+    if (els.wiktionaryLink) {
+        els.wiktionaryLink.hidden = !hasValidWord;
+    }
+
+    if (!hasValidWord) {
+        if (els.wiktionaryLink) {
+            els.wiktionaryLink.removeAttribute("href");
+        }
+        if (els.wiktionaryWord) {
+            els.wiktionaryWord.textContent = "";
+        }
+        return;
+    }
+
+    const url = buildWiktionaryWordUrl(state.lastValidWord);
+    if (els.wiktionaryLink) {
+        els.wiktionaryLink.href = url;
+    }
+    if (els.wiktionaryWord) {
+        els.wiktionaryWord.textContent = state.lastValidWord;
+    }
 }
 
 function formatIsoToHuman(isoString) {
@@ -378,7 +427,7 @@ function isMissingWiktionaryPage(page) {
 }
 
 async function checkWordInWiktionary(rawWord) {
-    const lookupWord = rawWord.trim().normalize("NFC").toLocaleLowerCase("es-ES");
+    const lookupWord = normalizeWiktionaryLookupWord(rawWord);
 
     const params = new URLSearchParams({
         action: "query",
@@ -526,6 +575,7 @@ async function handleSubmitAttempt(event) {
     }
 
     state.points += 1;
+    state.lastValidWord = rawWord.trim();
     startCooldown(2);
     addHistoryEntry({
         timestamp: new Date().toISOString(),
@@ -535,6 +585,7 @@ async function handleSubmitAttempt(event) {
     });
     persistState();
     renderScore();
+    renderWiktionaryPreview();
     renderHistory();
     setAttemptStatus("Correcto. Ganaste 1 punto y se genero una nueva combinación.", "ok");
     els.inputPalabra.value = "";
@@ -643,6 +694,7 @@ function initializeGame() {
 
     renderCombo();
     renderScore();
+    renderWiktionaryPreview();
     renderHistory();
     renderBannedCombos();
     updateCooldownUi();
