@@ -1,6 +1,6 @@
 const WIKTIONARY_API = "https://es.wiktionary.org/w/api.php";
 const STORAGE_KEY = "reto-letras-v1";
-const HISTORY_LIMIT = 200;
+const HISTORY_LIMIT = 20;
 const WILDCARD_SYMBOL = "?";
 const WILDCARD_PROBABILITY = 0.05;
 const COOLDOWN_MIN_SECONDS = 1;
