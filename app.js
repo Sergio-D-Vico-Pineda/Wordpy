@@ -339,7 +339,7 @@ function renderBannedCombos() {
 
     if (state.bannedCombos.size === 0) {
         const li = document.createElement("li");
-        li.className = "rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700";
+        li.className = "w-full text-center rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700";
         li.textContent = "No hay combinaciones bloqueadas.";
         els.listaBloqueadas.appendChild(li);
         return;
@@ -348,7 +348,8 @@ function renderBannedCombos() {
     const sorted = Array.from(state.bannedCombos).sort((a, b) => a.localeCompare(b, "es"));
     for (const combo of sorted) {
         const li = document.createElement("li");
-        li.className = "flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2";
+        li.className = "flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white ps-3 py-1 max-h-[46px]";
+        li.style.minWidth = "130px";
 
         const text = document.createElement("span");
         text.className = "font-semibold uppercase";
@@ -513,7 +514,7 @@ function parseComboInput(rawValue) {
     }
 
     if (cleaned.length !== 3 || !/^[a-z\u00f1]{3}$/u.test(cleaned)) {
-        return { ok: false, error: "La combinación debe tener 3 letras (a-z o n)." };
+        return { ok: false, error: "La combinación debe tener 3 letras (a-z o ?)." };
     }
 
     return { ok: true, value: cleaned };
@@ -540,7 +541,7 @@ async function handleSubmitAttempt(event) {
     const comboOk = comboMatchesWord(state.currentCombo, rawWord);
     if (!comboOk) {
         startCooldown(createCooldownSeconds());
-        setAttemptStatus("La palabra no cumple el orden de la combinacion actual.", "error");
+        setAttemptStatus("La palabra no cumple el orden de la combinación actual.", "error");
         addHistoryEntry({
             timestamp: new Date().toISOString(),
             word: rawWord,
@@ -587,7 +588,7 @@ async function handleSubmitAttempt(event) {
     renderScore();
     renderWiktionaryPreview();
     renderHistory();
-    setAttemptStatus("Correcto. Ganaste 1 punto y se genero una nueva combinación.", "ok");
+    setAttemptStatus("¡Correcto! Palabra válida.", "ok");
     els.inputPalabra.value = "";
     moveToNextCombo();
 }

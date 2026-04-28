@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
     --color-bg: #eef7ff;
     --color-bg-shape: #d7ecff;
@@ -50,7 +52,8 @@ body {
     justify-content: center;
     border-radius: 0.75rem;
     border: 1px solid transparent;
-    padding: 0.55rem 0.95rem;
+    /* padding: 0.55rem 0.95rem; */
+    padding: 0.5rem;
     font-size: 0.92rem;
     font-weight: 700;
     text-decoration: none;
@@ -59,23 +62,30 @@ body {
 }
 
 .btn-primary {
-    background: var(--color-primary);
-    color: #052337;
+    background: linear-gradient(135deg, var(--color-primary) 0%, #0284c7 100%);
+    color: #ffffff;
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 .btn-primary:hover {
-    filter: brightness(1.04);
-    transform: translateY(-1px);
+    filter: brightness(1.08);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);
 }
 
 .btn-secondary {
-    border-color: var(--color-primary-strong);
+    border: 1px solid #0284c7;
     background: #f0f9ff;
     color: #0b4c73;
+    font-weight: 600;
+    font-size: 0.875rem;
 }
 
 .btn-secondary:hover {
     background: #e0f2fe;
+    border-color: #0369a1;
+    transform: translateY(-1px);
 }
 
 .btn-danger {
@@ -123,26 +133,25 @@ a:focus-visible {
 }
 
 .combo-chip {
+    display: inline-flex;
+    /* permite centrar vertical y horizontal */
+    align-items: center;
+    /* centra verticalmente */
+    justify-content: center;
+    /* centra horizontalmente */
+
     min-width: 4rem;
     min-height: 4rem;
-    border: 1px solid #7dd3fc;
-    border-radius: 1.15rem;
-    padding: 0.5rem 0.95rem;
-    font-size: 1.7rem;
-    font-weight: 800;
-    text-align: center;
+    border: 1px solid #0ea5e9;
+    border-radius: 1.25rem;
+    font-size: 2rem;
+    font-weight: 700;
     text-transform: uppercase;
-    background: linear-gradient(180deg, #ffffff 0%, #ecfeff 100%);
-    box-shadow: 0 14px 22px -18px #0f172a;
-}
-
-#combo-actual {
-    flex-wrap: nowrap;
-    justify-content: center;
-    align-items: center;
-    overflow-x: auto;
+    background: linear-gradient(135deg, #ffffff 0%, #e0f7ff 100%);
+    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.2);
     padding-bottom: 0.25rem;
-    scrollbar-width: none;
+    padding-top: 0;
+    /* o 0.1rem según la fuente */
 }
 
 #combo-actual::-webkit-scrollbar {
